@@ -5,11 +5,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
 
-public interface IPrompt
-{
-    string promptName { get; }
-}
-
 public class PlayerSight : MonoBehaviour
 {
     [Header("Look")]

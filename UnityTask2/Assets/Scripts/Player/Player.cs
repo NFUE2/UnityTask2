@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public interface IDamagable
-{
-    void TakeDamage(float damage);
-}
-
 public class Player : MonoBehaviour,IDamagable
 {
     public Condition playerHP;
