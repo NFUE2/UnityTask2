@@ -12,13 +12,11 @@ public class Condition : MonoBehaviour
     public TextMeshProUGUI valueText;
     public Image uiBar;
 
-    // Start is called before the first frame update
     void Start()
     {
         curValue = maxValue;
     }
 
-    // Update is called once per frame
     void Update()
     {
         uiBar.fillAmount = GetPercent();
