@@ -13,11 +13,14 @@ public class PlayerSight : MonoBehaviour
     private float minAngle = -85f, maxAngle = 85f, rotX;
     private Camera camera;
 
+    [Header("Display")]
     public float maxDistance;
     public TextMeshProUGUI prompt;
     public LayerMask infoLayer;
     private float lastRayTime;
     public float rayRate = 0.5f;
+
+    Item selectItem;
 
     private void Awake()
     {
@@ -60,9 +63,20 @@ public class PlayerSight : MonoBehaviour
             {
                 prompt.gameObject.SetActive(true);
                 prompt.text = target.promptName;
+
+                hit.collider.TryGetComponent(out selectItem);
             }
             else
+            {
                 prompt.gameObject.SetActive(false);
+                selectItem = null;
+            }
         }
+    }
+
+    public void Interaction()
+    {
+        selectItem.TryGetComponent(out IUseItem item);
+        if(item != null) item.UseItem();
     }
 }

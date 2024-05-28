@@ -11,7 +11,7 @@ public enum PotionType
 }
 
 [CreateAssetMenu(fileName = "Posion",menuName = "Postion")]
-public class Potion : ItemData
+public class PotionData : ItemData
 {
     [Header("Potion")]
     public int value;

@@ -5,16 +5,15 @@ using UnityEngine;
 public class Trap : MonoBehaviour, IPrompt
 {
     public float damage;
-
     public string trapName;
 
-    public string promptName { get => trapName; }
+    public string promptName => trapName;
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.TryGetComponent(out IDamagable damagable))
+        if(collision.gameObject.TryGetComponent(out IChangeHP damagable))
         {
-            damagable.TakeDamage(damage);
+            damagable.Change(-damage);
         }
     }
 }

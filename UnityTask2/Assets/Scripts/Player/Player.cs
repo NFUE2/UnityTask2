@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour,IDamagable
+public class Player : MonoBehaviour, IChangeHP
 {
     public Condition playerHP;
-
     public float HP;
 
     private void Start()
@@ -14,8 +13,8 @@ public class Player : MonoBehaviour,IDamagable
         playerHP.maxValue = HP;
     }
 
-    public void TakeDamage(float damage)
+    public void Change(float damage)
     {
-        playerHP.curValue -= damage;
+        playerHP.curValue = Mathf.Clamp(playerHP.curValue + damage,0,playerHP.maxValue);
     }
 }
