@@ -5,13 +5,22 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
 
-public class PlayerSight : MonoBehaviour
+enum SightType
 {
+    first,
+    third,
+}
+
+public class PlayerSight : MonoBehaviour,IChangeStat
+{
+    Player player;
+
     [Header("Look")]
+    private SightType sightType = SightType.first;
     private Vector2 mouseDirection;
-    public float rotIntesity = 1.0f;
+    public float rotIntesity;
     private float minAngle = -85f, maxAngle = 85f, rotX;
-    private Camera camera;
+    public Transform camera;
 
     [Header("Display")]
     public float maxDistance;
@@ -20,11 +29,18 @@ public class PlayerSight : MonoBehaviour
     private float lastRayTime;
     public float rayRate = 0.5f;
 
+
     Item selectItem;
 
     private void Awake()
     {
-        camera = Camera.main;
+        player = GetComponent<Player>();
+        player.OnChangeStatEvent += ChangeStat;
+    }
+
+    private void Start()
+    {
+        rotIntesity = player.data.rotIntesity;
     }
 
     private void Update()
@@ -55,14 +71,14 @@ public class PlayerSight : MonoBehaviour
         if (Time.time - lastRayTime > rayRate)
         {
             lastRayTime = Time.time;
-            Ray ray = camera.ScreenPointToRay(new Vector2(Screen.width / 2, Screen.height / 2));
+            Ray ray = Camera.main.ScreenPointToRay(new Vector2(Screen.width / 2, Screen.height / 2));
 
             RaycastHit hit;
 
             if(Physics.Raycast(ray,out hit,maxDistance,infoLayer) && hit.collider.TryGetComponent(out IPrompt target))
             {
                 prompt.gameObject.SetActive(true);
-                prompt.text = target.promptName;
+                prompt.text = $"{target.promptName}";
 
                 hit.collider.TryGetComponent(out selectItem);
             }
@@ -74,9 +90,25 @@ public class PlayerSight : MonoBehaviour
         }
     }
 
-    public void Interaction()
+    public void OnInteraction(InputAction.CallbackContext context)
     {
-        selectItem.TryGetComponent(out IUseItem item);
-        if(item != null) item.UseItem();
+        if (context.phase == InputActionPhase.Started && selectItem != null && selectItem.TryGetComponent(out IUseItem item)) 
+        {
+            if (item != null) item.UseItem();
+
+        }
+    }
+
+    public void OnChangeSightType()
+    {
+        bool sightCheck = sightType == SightType.first;
+
+        Camera.main.transform.localPosition += sightCheck ? new Vector3(0, 1, -5) : -new Vector3(0, 1, -5);
+        sightType = sightCheck ? SightType.third : SightType.first;
+    }
+
+    public void ChangeStat()
+    {
+        rotIntesity = player.data.rotIntesity;
     }
 }

@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
-
 
 public enum PotionType
 {
@@ -10,11 +8,10 @@ public enum PotionType
     Reinforcement
 }
 
-[CreateAssetMenu(fileName = "Posion",menuName = "Postion")]
+[CreateAssetMenu(fileName = "Potion",menuName = "Postion/Potion",order = 0)]
 public class PotionData : ItemData
 {
     [Header("Potion")]
-    public int value;
+    public float value;
     public PotionType type;
-    public Image icon;
 }

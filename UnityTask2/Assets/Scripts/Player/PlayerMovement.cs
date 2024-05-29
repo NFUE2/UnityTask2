@@ -3,26 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerMovement : MonoBehaviour
+//enum PlayerState
+//{
+//    Walk,
+//    Climb,
+//}
+
+public class PlayerMovement : MonoBehaviour,IChangeStat
 {
     private Rigidbody rigidbody;
+    private Player player;
 
     [Header("Move")]
     private Vector2 direction;
-    public float speed = 5.0f;
+    public float speed;
 
-    public float jumpPower;
+    private float jumpPower;
     public LayerMask groundlayer;
+    public LayerMask climblayer;
+
+    //PlayerState state = PlayerState.Walk;
 
     private void Awake()
     {
-        rigidbody = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
+        rigidbody = GetComponent<Rigidbody>();
+        player = GetComponent<Player>();
+        player.OnChangeStatEvent += ChangeStat;
     }
 
+    private void Start()
+    {
+        jumpPower = player.data.jumpPower;
+    }
 
     private void FixedUpdate()
     {
+        //if (state == PlayerState.Climb) Climing();
+        //else Moving();
         Moving();
     }
 
@@ -36,6 +54,13 @@ public class PlayerMovement : MonoBehaviour
 
         else
             direction = Vector3.zero;
+
+        //if (isClimb())
+        //{
+        //    state = PlayerState.Climb;
+        //    rigidbody.useGravity = false;
+        //    rigidbody.velocity = Vector3.zero;
+        //}
     }
 
     private void Moving()
@@ -43,6 +68,13 @@ public class PlayerMovement : MonoBehaviour
         Vector3 dir = (transform.forward * direction.y + transform.right * direction.x) * speed;
         dir.y = rigidbody.velocity.y;
         rigidbody.velocity = dir;
+    }
+
+    private void Climing()
+    {
+        Vector3 dir = Vector3.zero + new Vector3(0,transform.position.y,0);
+
+        rigidbody.MovePosition(transform.position + dir * 1.0f * Time.fixedDeltaTime);
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -69,6 +101,29 @@ public class PlayerMovement : MonoBehaviour
                 return false;
         }
 
+        return true;
+    }
+
+    public void ChangeStat()
+    {
+        speed = player.data.speed;
+    }
+
+    private bool isClimb()
+    {
+
+        Ray[] ray = new Ray[2]
+        {
+            new Ray(transform.position + Vector3.up * 0.01f,Vector3.forward),
+            new Ray(transform.position + Vector3.up * 1.5f,Vector3.forward)
+        };
+        for (int i = 0; i < ray.Length; i++)
+        {
+            if(!Physics.Raycast(ray[i],1f,climblayer))
+            {
+                return false;
+            }
+        }
         return true;
     }
 }
