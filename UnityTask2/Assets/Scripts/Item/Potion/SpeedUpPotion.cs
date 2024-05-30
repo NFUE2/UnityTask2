@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SpeedUpPotion : Item, IUseItem,IEffectUI
+public class SpeedUpPotion : Item, IEffectUI
 {
     public float maxTime => (data as ReinforcePotionData).maxTime;
     public Sprite icon => (data as ReinforcePotionData).icon;
@@ -11,22 +11,17 @@ public class SpeedUpPotion : Item, IUseItem,IEffectUI
     float value;
     Player player;
 
-
-
-    private void Start()
-    {
-        player = GameManager.instance.player;
-        value = (data as PotionData).value * player.data.speed;
-    }
-
     public float curTime
     {
         get => (data as ReinforcePotionData).curTime;
         set => (data as ReinforcePotionData).curTime = value;
     }
 
-    public void UseItem()
+    public override void Interaction(Player player)
     {
+        if (value == 0.0f) value = (data as PotionData).value * player.data.speed;
+
+        this.player = player;
         player.GetEffect(this);
     }
 

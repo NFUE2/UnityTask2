@@ -7,26 +7,32 @@ public class Paddle : MonoBehaviour
     Rigidbody paddle,player;
     Vector3 direction;
 
+    public Transform[] rallyPoint;
+    public int curTargetPoint;
+
     public float speed;
 
     private void Awake()
     {
         paddle = GetComponent<Rigidbody>();
     }
+
     private void OnCollisionEnter(Collision collision)
     {
-        bool boarding = collision.contacts[0].normal == Vector3.down;
-
-        if (collision.gameObject.TryGetComponent(out player) && boarding)
-            direction = transform.forward * speed;
+        collision.gameObject.TryGetComponent(out player);
     }
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player")) player = null;
+    }
+
+    private void Update()
+    {
+        if (Vector3.Distance(paddle.position, rallyPoint[curTargetPoint].position) < 1f)
         {
-            player = null;
-            direction = Vector3.zero;
+            curTargetPoint = (curTargetPoint + 1) % rallyPoint.Length;
+            direction = (rallyPoint[curTargetPoint].position - paddle.position).normalized * speed;
         }
     }
 
@@ -34,7 +40,8 @@ public class Paddle : MonoBehaviour
     {
         Vector3 dir = direction * Time.fixedDeltaTime;
 
-        paddle.MovePosition(transform.position + dir);
+        paddle.MovePosition(paddle.position + dir);
+
         if (player != null) player.MovePosition(player.position + dir);
     }
 }

@@ -29,8 +29,7 @@ public class PlayerSight : MonoBehaviour,IChangeStat
     private float lastRayTime;
     public float rayRate = 0.5f;
 
-
-    Item selectItem;
+    IInteractable selectTarget;
 
     private void Awake()
     {
@@ -52,6 +51,7 @@ public class PlayerSight : MonoBehaviour,IChangeStat
     {
         Look();
     }
+
     public void OnLook(InputAction.CallbackContext context)
     {
         mouseDirection = context.ReadValue<Vector2>();
@@ -75,27 +75,27 @@ public class PlayerSight : MonoBehaviour,IChangeStat
 
             RaycastHit hit;
 
-            if(Physics.Raycast(ray,out hit,maxDistance,infoLayer) && hit.collider.TryGetComponent(out IPrompt target))
+            if(Physics.Raycast(ray,out hit,maxDistance,infoLayer) && hit.collider.TryGetComponent(out IInteractable target))
             {
                 prompt.gameObject.SetActive(true);
-                prompt.text = $"{target.promptName}";
+                prompt.text = $"{target.message}";
 
-                hit.collider.TryGetComponent(out selectItem);
+                selectTarget = target;
             }
             else
             {
                 prompt.gameObject.SetActive(false);
-                selectItem = null;
+                selectTarget = null;
             }
         }
     }
 
     public void OnInteraction(InputAction.CallbackContext context)
     {
-        if (context.phase == InputActionPhase.Started && selectItem != null && selectItem.TryGetComponent(out IUseItem item)) 
+        if (context.phase == InputActionPhase.Started && selectTarget != null)
         {
-            if (item != null) item.UseItem();
 
+            selectTarget.Interaction(player);
         }
     }
 

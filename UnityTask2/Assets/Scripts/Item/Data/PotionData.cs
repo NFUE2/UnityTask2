@@ -8,7 +8,7 @@ public enum PotionType
     Reinforcement
 }
 
-[CreateAssetMenu(fileName = "Potion",menuName = "Postion/Potion",order = 0)]
+[CreateAssetMenu(fileName = "Potion",menuName = "item/Potion",order = 0)]
 public class PotionData : ItemData
 {
     [Header("Potion")]

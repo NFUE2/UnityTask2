@@ -16,11 +16,10 @@ public class Player : MonoBehaviour, IChangeHP
 
     public event Action OnChangeStatEvent;
 
-    public List<Item> items = new List<Item>();
+    public List<Equipment> equipments = new List<Equipment>();
     public List<IEffectUI> itemEffect = new List<IEffectUI>();
 
-
-    private void Start()
+    private void Awake()
     {
         playerHP.maxValue = HP;
         OnChangeStatEvent?.Invoke();
@@ -38,9 +37,7 @@ public class Player : MonoBehaviour, IChangeHP
         Image go = Instantiate(buffPrefab,buffTransfrom);
         go.GetComponent<UIicon>().effect = ui;
         go.sprite = ui.icon;
-
         ui.ApplyEffect();
-
         OnChangeStatEvent?.Invoke();
         
         itemEffect.Add(ui);
@@ -55,13 +52,19 @@ public class Player : MonoBehaviour, IChangeHP
         itemEffect.Remove(ui);
     }
 
-    public void EquipItem()
+    public void Equip(Equipment equipment)
     {
-
+        equipments.Add(equipment);
+        equipment.Equip();
+        OnChangeStatEvent?.Invoke();
     }
 
-    public void UnEquip()
+    public void AllUnEquip()
     {
-
+        for(int i = 0; i < equipments.Count; i++)
+        {
+            equipments[i].UnEquip();
+            equipments.Remove(equipments[i]);
+        }
     }
 }

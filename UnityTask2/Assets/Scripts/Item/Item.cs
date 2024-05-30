@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour, IPrompt
+public class Item : MonoBehaviour, IInteractable
 {
     public ItemData data;
-    public string promptName => data.itemName;
+    public string message => data.itemName;
+
+    public virtual void Interaction(Player player) { }
 }
