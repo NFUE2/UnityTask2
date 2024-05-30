@@ -38,7 +38,10 @@ public class DoorTrap : MonoBehaviour
             hit = true;
         }
         else if (hit && !raycast)
+        {
             StartCoroutine(ClosePrompt());
+            hit = false;
+        }
     }
 
     IEnumerator ClosePrompt()
