@@ -61,9 +61,7 @@ public class PlayerSight : MonoBehaviour,IChangeStat
     {
         rotX += mouseDirection.y * rotIntesity;
         rotX = Mathf.Clamp(rotX, minAngle, maxAngle);
-        camera.transform.localEulerAngles = new Vector3(-rotX, 0, 0);
-
-        transform.localEulerAngles += new Vector3(0, mouseDirection.x, 0);
+        camera.localEulerAngles = new Vector3(-rotX, camera.localEulerAngles.y + mouseDirection.x, 0);
     }
 
     private void DisplayPrompt()
@@ -94,7 +92,6 @@ public class PlayerSight : MonoBehaviour,IChangeStat
     {
         if (context.phase == InputActionPhase.Started && selectTarget != null)
         {
-
             selectTarget.Interaction(player);
         }
     }

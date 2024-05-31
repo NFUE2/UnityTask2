@@ -3,26 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-//enum PlayerState
-//{
-//    Walk,
-//    Climb,
-//}
-
 public class PlayerMovement : MonoBehaviour,IChangeStat
 {
     private Rigidbody rigidbody;
     private Player player;
 
+
     [Header("Move")]
     private Vector2 direction;
     public float speed;
+    public Transform character;
 
     private float jumpPower;
     public LayerMask groundlayer;
     public LayerMask climblayer;
 
-    //PlayerState state = PlayerState.Walk;
+    public Transform camera;
+
+    bool isClimb;
 
     private void Awake()
     {
@@ -39,9 +37,9 @@ public class PlayerMovement : MonoBehaviour,IChangeStat
 
     private void FixedUpdate()
     {
-        //if (state == PlayerState.Climb) Climing();
-        //else Moving();
-        Moving();
+
+        if (!isClimb) Moving();
+        else Climbing();
     }
 
 
@@ -54,27 +52,34 @@ public class PlayerMovement : MonoBehaviour,IChangeStat
 
         else
             direction = Vector3.zero;
-
-        //if (isClimb())
-        //{
-        //    state = PlayerState.Climb;
-        //    rigidbody.useGravity = false;
-        //    rigidbody.velocity = Vector3.zero;
-        //}
     }
 
     private void Moving()
     {
-        Vector3 dir = (transform.forward * direction.y + transform.right * direction.x) * speed;
+        
+        Vector3 dir = (camera.transform.forward * direction.y + camera.transform.right * direction.x) * speed;
+
         dir.y = rigidbody.velocity.y;
         rigidbody.velocity = dir;
+
+        character.localEulerAngles = new Vector3(0, camera.localEulerAngles.y, 0);
+
+        if (direction.y > 0 && IsClimb())
+        {
+            isClimb = true;
+            character.localEulerAngles = new Vector3(0, camera.localEulerAngles.y, 0);
+            //rigidbody.velocity = Vector2.zero;
+        }
     }
 
-    private void Climing()
+    private void Climbing()
     {
-        Vector3 dir = Vector3.zero + new Vector3(0,transform.position.y,0);
+        rigidbody.AddForce(character.forward,ForceMode.VelocityChange);
+        Vector3 dir = (transform.up * direction.y + transform.right * direction.x) * speed;
 
-        rigidbody.MovePosition(transform.position + dir * 1.0f * Time.fixedDeltaTime);
+        rigidbody.velocity = dir;
+
+        if ((!IsClimb() || !IsJumping()) && direction.y < 0) isClimb = false;
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -109,17 +114,18 @@ public class PlayerMovement : MonoBehaviour,IChangeStat
         speed = player.data.speed;
     }
 
-    private bool isClimb()
+    private bool IsClimb()
     {
 
         Ray[] ray = new Ray[2]
         {
-            new Ray(transform.position + Vector3.up * 0.01f,Vector3.forward),
-            new Ray(transform.position + Vector3.up * 1.5f,Vector3.forward)
+            new Ray(character.position + character.up * 0.1f,character.forward),
+            new Ray(character.position + character.up * 1.5f,character.forward)
         };
+
         for (int i = 0; i < ray.Length; i++)
         {
-            if(!Physics.Raycast(ray[i],1f,climblayer))
+            if(!Physics.Raycast(ray[i],0.5f,climblayer))
             {
                 return false;
             }
